@@ -1,10 +1,7 @@
-
-const store = new Map();
-
 export async function storeDiscordTokens(userId, tokens) {
-  await store.set(`discord-${userId}`, tokens);
+  await TOKEN_STORE.put(`discord-${userId}`, JSON.stringify(tokens));
 }
 
 export async function getDiscordTokens(userId) {
-  return store.get(`discord-${userId}`);
+  return TOKEN_STORE.get(`discord-${userId}`, { type: "json" });
 }

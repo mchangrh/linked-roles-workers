@@ -1,0 +1,9 @@
+name = "linked-role-worker"
+main = "src/server.js"
+
+account_id = ""
+workers_dev = true
+kv_namespaces = [
+  { binding = "TOKEN_STORE", id=""},
+]
+compatibility_date = "2023-02-22"

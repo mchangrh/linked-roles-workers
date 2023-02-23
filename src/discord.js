@@ -1,8 +1,4 @@
-import crypto from 'crypto';
-import fetch from 'node-fetch';
-
 import * as storage from './storage.js';
-import config from './config.js';
 
 /**
  * Code specific to communicating with the Discord API.
@@ -21,12 +17,15 @@ export function getOAuthUrl() {
   const state = crypto.randomUUID();
 
   const url = new URL('https://discord.com/api/oauth2/authorize');
-  url.searchParams.set('client_id', config.DISCORD_CLIENT_ID);
-  url.searchParams.set('redirect_uri', config.DISCORD_REDIRECT_URI);
-  url.searchParams.set('response_type', 'code');
-  url.searchParams.set('state', state);
-  url.searchParams.set('scope', 'role_connections.write identify');
-  url.searchParams.set('prompt', 'consent');
+  const searchParams = new URLSearchParams({
+    client_id: DISCORD_CLIENT_ID,
+    redirect_uri: DISCORD_REDIRECT_URI,
+    response_type: 'code',
+    state,
+    scope: 'role_connections.write identify',
+    prompt: 'consent'
+  });
+  url.search = searchParams.toString();
   return { state, url: url.toString() };
 }
 
@@ -37,11 +36,11 @@ export function getOAuthUrl() {
 export async function getOAuthTokens(code) {
   const url = 'https://discord.com/api/v10/oauth2/token';
   const body = new URLSearchParams({
-    client_id: config.DISCORD_CLIENT_ID,
-    client_secret: config.DISCORD_CLIENT_SECRET,
+    client_id: DISCORD_CLIENT_ID,
+    client_secret: DISCORD_CLIENT_SECRET,
     grant_type: 'authorization_code',
     code,
-    redirect_uri: config.DISCORD_REDIRECT_URI,
+    redirect_uri: DISCORD_REDIRECT_URI,
   });
 
   const response = await fetch(url, {
@@ -68,8 +67,8 @@ export async function getAccessToken(userId, tokens) {
   if (Date.now() > tokens.expires_at) {
     const url = 'https://discord.com/api/v10/oauth2/token';
     const body = new URLSearchParams({
-      client_id: config.DISCORD_CLIENT_ID,
-      client_secret: config.DISCORD_CLIENT_SECRET,
+      client_id: DISCORD_CLIENT_ID,
+      client_secret: DISCORD_CLIENT_SECRET,
       grant_type: 'refresh_token',
       refresh_token: tokens.refresh_token,
     });
